@@ -82,7 +82,8 @@
           if (e.code === 'Enter'){
 
             if (searchInput.value.length > 0){
-              document.querySelector('#searchq').innerHTML = searchInput.value;
+              const val = searchInput.value;
+              document.querySelector('#searchq').innerHTML = val;
               searchInput.value = "";
 
                 $.ajaxPrefilter( function (options) {
@@ -92,7 +93,7 @@
                 }
               });
               $.get(
-                  'https://www.google.com/search?q=dog',
+                  'https://www.google.com/search?q='+val,
                   function (response) {
                       console.log("> ", response);
                       $("#searchResults").html(response);
