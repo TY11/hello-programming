@@ -84,7 +84,7 @@
             if (searchInput.value.length > 0){
               document.querySelector('#searchq').innerHTML = searchInput.value;
               searchInput.value = "";
-                /*
+
                 $.ajaxPrefilter( function (options) {
                 if (options.crossDomain && jQuery.support.cors) {
                   var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
@@ -93,23 +93,13 @@
                 }
               });
               $.get(
-                  'http://en.wikipedia.org/wiki/Cross-origin_resource_sharing',
+                  'https://www.google.com',
                   function (response) {
                       console.log("> ", response);
                       $("#searchResults").html(response);
-              });*/
-              $.ajaxSetup({
-                  scriptCharset: "utf-8", //or "ISO-8859-1"
-                  contentType: "application/json; charset=utf-8"
               });
-              $.getJSON('http://whateverorigin.org/get?url=' +encodeURIComponent('http://google.com') + '&callback=?',
-                  function (data) {
-                      console.log("> ", data);
-                      //If the expected response is text/plain
-                      $("#searchResults").html(data.contents);
-                      //If the expected response is JSON
-                      //var response = $.parseJSON(data.contents);
-              });
+
+
             }
 
           };
