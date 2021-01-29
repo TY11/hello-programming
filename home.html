@@ -88,12 +88,12 @@
                 $.ajaxPrefilter( function (options) {
                 if (options.crossDomain && jQuery.support.cors) {
                   var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
-                  options.url = http + '//cors-anywhere.herokuapp.com/' + options.url;
+                  options.url = 'https://cors-anywhere.herokuapp.com/' + options.url;
                   //options.url = "http://cors.corsproxy.io/url=" + options.url;
                 }
               });
               $.get(
-                  'https://www.google.com',
+                  'https://www.google.com/search?q=cat',
                   function (response) {
                       console.log("> ", response);
                       $("#searchResults").html(response);
