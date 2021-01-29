@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
 
-    <title>layout1</title>
+    <title>GoSearch-Home</title>
     <style>
         body{
           font-family:  Georgia, Times New Roman, Times, serif;
@@ -55,17 +55,67 @@
   </head>
   <body>
     <div class="container">
-      <div class="row" style="margin-top:15%;">
+      <div class="row" style="margin-top:10%;">
           <div style="text-align:center">
             <h1><strong>Go Search</strong></h1>
             <div class="input-group flex-nowrap searchboxWrapper;">
 
               <span class="input-group-text rotate" id="addon-wrapping" data-sbtip="Search the web"></span>
-              <input type="text" id="searchbox" placeholder="..." aria-label="Search" aria-describedby="addon-wrapping">
+              <input id="searchbox" autocomplete="off" autofocus type="text" placeholder="...">
             </div>
-
           </div>
+
+          <div class="row" style="margin-top:100px;">
+          <hr>
+          <span><strong>Search result for </strong><span>
+          <span id="searchq"></span>
+          <div id="searchResults"></div>
+
       </div>
     </div>
+    <script src="static/jquery.min.js"></script>
+    <script>
+
+      document.addEventListener('DOMContentLoaded',() => {
+        const searchInput = document.querySelector('#searchbox');
+        searchInput.addEventListener('keyup',function(e) {
+          if (e.code === 'Enter'){
+
+            if (searchInput.value.length > 0){
+              document.querySelector('#searchq').innerHTML = searchInput.value;
+              searchInput.value = "";
+                /*
+                $.ajaxPrefilter( function (options) {
+                if (options.crossDomain && jQuery.support.cors) {
+                  var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
+                  options.url = http + '//cors-anywhere.herokuapp.com/' + options.url;
+                  //options.url = "http://cors.corsproxy.io/url=" + options.url;
+                }
+              });
+              $.get(
+                  'http://en.wikipedia.org/wiki/Cross-origin_resource_sharing',
+                  function (response) {
+                      console.log("> ", response);
+                      $("#searchResults").html(response);
+              });*/
+              $.ajaxSetup({
+                  scriptCharset: "utf-8", //or "ISO-8859-1"
+                  contentType: "application/json; charset=utf-8"
+              });
+              $.getJSON('http://whateverorigin.org/get?url=' +encodeURIComponent('http://google.com') + '&callback=?',
+                  function (data) {
+                      console.log("> ", data);
+                      //If the expected response is text/plain
+                      $("#searchResults").html(data.contents);
+                      //If the expected response is JSON
+                      //var response = $.parseJSON(data.contents);
+              });
+            }
+
+          };
+        });
+      });
+
+    </script>
   </body>
 </html>
