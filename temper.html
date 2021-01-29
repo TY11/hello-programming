@@ -1,0 +1,206 @@
+<article class="baidu_pl">
+        <div id="article_content" class="article_content clearfix" style="height: 2000px; overflow: hidden;">
+        <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/ck_htmledit_views-b5506197d8.css">
+                <div id="content_views" class="markdown_views prism-atom-one-light">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path stroke-linecap="round" d="M5,0 0,2.5 5,5z" id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+                    </svg>
+                    <blockquote>
+ <p>前端开发中我们经常会遇到跨域请求的情况，处理跨域请求方式很多，特整理如下：</p>
+</blockquote>
+<h3><a name="t0"></a><a name="t0"></a><a id="_1"></a>浏览器的同源策略</h3>
+<p>首选，<strong>跨域</strong>是由于浏览器端的<strong>同源策略</strong>限制所得来。</p>
+<blockquote>
+ <p><strong>同源策略</strong>限制了从同一个源加载的文档或脚本如何与来自另一个源的资源进行交互。这是一个用于隔离潜在恶意文件的重要安全机制。</p>
+</blockquote>
+<p>那么，何为同源呢？只有当<strong>协议</strong>、<strong>端口</strong>、<strong>域名</strong>都相同的页面，则两个页面具有相同的<strong>源</strong>。只要网站的协议protocol、 主机host、 端口号port 这三个中的任意一个不同，网站间的数据请求与传输便构成了跨域调用，会受到<strong>同源策略</strong>的限制。</p>
+<p>浏览器的同源策略，出于防范跨站脚本的攻击，禁止客户端脚本（如 JavaScript）对不同域的服务进行跨站调用（通常指使用 XMLHttpRequest 请求）。</p>
+<h3><a name="t1"></a><a name="t1"></a><a id="_11"></a>跨域请求方式</h3>
+<p>解决跨域问题，最简单的莫过于通过 <strong>Nginx 反向代理</strong> 进行实现，但是其需要在服务器层面修改，且有可能请求的资源并不再我们控制范围内（第三方），所以该方式不能作为通用的解决方案，下面阐述了经常用到几种跨域方式：</p>
+<h3><a name="t2"></a><a name="t2"></a><a id="pingscript_15"></a>方式一：图片ping或script标签跨域</h3>
+<p><strong>图片ping</strong> 常用于跟踪用户点击页面或动态广告曝光次数。<br> <strong>script标签</strong> 可以得到从其他来源数据，这也是 JSONP 依赖的根据。</p>
+<pre class="prettyprint"><code class="prism language-html has-numbering" onclick="mdcp.signin(event)" style="position: unset;"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>img</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>https://domain.com/pn<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+<div class="hljs-button signin" data-title="登录后复制" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.4259&quot;}"></div></code><ul class="pre-numbering" style=""><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<h4><a id="_24"></a>缺点</h4>
+<ul><li>只能发送Get请求 ，无法访问服务器的响应文本（单向请求）</li></ul>
+<h3><a name="t3"></a><a name="t3"></a><a id="JSONP_28"></a>方式二：JSONP跨域</h3>
+<p><strong>JSONP</strong>（<strong>JSON with Padding</strong>）是数据格式 <a href="https://zh.wikipedia.org/wiki/JSON">JSON</a> 的一种“使用模式”，可以让网页从别的网域要数据。根据 XmlHttpRequest 对象受到同源策略的影响，而利用 <a href="https://zh.wikipedia.org/wiki/HTML%E5%85%83%E7%B4%A0#script_tag"><code>&lt;script&gt;</code></a> 元素的这个开放策略，网页可以得到从其他来源动态产生的JSON数据，而这种使用模式就是所谓的 JSONP。用JSONP抓到的数据并不是JSON，而是任意的JavaScript，用 JavaScript解释器运行而不是用JSON解析器解析。所有，通过Chrome查看所有JSONP发送的Get请求都是js类型，而非 XHR。<br> <img src="https://img-blog.csdnimg.cn/20190729223736204.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9saWdhbmcuYmxvZy5jc2RuLm5ldA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h4><a id="_32"></a>缺点：</h4>
+<ul><li>只能使用Get请求</li><li>不能注册 success、error 等事件监听函数，不能很容易的确定 JSONP 请求是否失败</li><li>JSONP 是从其他域中加载代码执行，容易受到跨站请求伪造的攻击，其安全性无法确保</li></ul>
+<h3><a name="t4"></a><a name="t4"></a><a id="CORS_38"></a>方式三：CORS</h3>
+<p>Cross-Origin Resource Sharing（CORS）跨域资源共享是一份浏览器技术的规范，提供了 Web 服务从不同域传来沙盒脚本的方法，以避开浏览器的同源策略，确保安全的跨域数据传输。现代浏览器使用CORS在API容器如XMLHttpRequest来减少HTTP请求的风险来源。与 JSONP 不同，CORS 除了 GET 要求方法以外也支持其他的 HTTP 要求。服务器一般需要增加如下响应头的一种或几种：</p>
+<pre class="prettyprint"><code class="prism language-shell has-numbering" onclick="mdcp.signin(event)" style="position: unset;">Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: POST, GET, OPTIONS
+Access-Control-Allow-Headers: X-PINGOTHER, Content-Type
+Access-Control-Max-Age: 86400
+<div class="hljs-button signin" data-title="登录后复制" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.4259&quot;}"></div></code><ul class="pre-numbering" style=""><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li></ul></pre>
+<p>跨域请求默认不会携带Cookie信息，如果需要携带，请配置下述参数：</p>
+<pre class="prettyprint"><code class="prism language-shell has-numbering" onclick="mdcp.signin(event)" style="position: unset;">Access-Control-Allow-Credentials: <span class="token boolean">true</span>
+<span class="token comment"># Ajax设置</span>
+withCredentials: <span class="token boolean">true</span>
+<div class="hljs-button signin" data-title="登录后复制" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.4259&quot;}"></div></code><ul class="pre-numbering" style=""><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li></ul></pre>
+<h3><a name="t5"></a><a name="t5"></a><a id="windownameiframe_56"></a>方式四：window.name+iframe</h3>
+<p><code>window.name</code>通过在iframe（一般动态创建i）中加载跨域HTML文件来起作用。然后，HTML文件将传递给请求者的字符串内容赋值给<code>window.name</code>。然后，请求者可以检索window.name值作为响应。</p>
+<ul><li><code>iframe</code> 标签的跨域能力；</li><li><code>window.name</code> 属性值在文档刷新后依旧存在的能力（且最大允许2M左右）。</li></ul>
+<p>每个 iframe 都有包裹它的 window，而这个 window 是 top window 的子窗口。<strong>contentWindow</strong>属性返回<code>&lt;iframe&gt;</code>元素的Window对象。你可以使用这个Window对象来访问iframe的文档及其内部DOM。</p>
+<p><em>下述用端口：10000表示 — domainA；10001表示 — domainB</em></p>
+<pre class="prettyprint"><code class="prism language-html has-numbering" onclick="mdcp.signin(event)" style="position: unset;"><span class="token comment">&lt;!-- localhost:10000 --&gt;</span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">&gt;</span></span><span class="token script language-javascript">
+  <span class="token keyword">var</span> iframe <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span><span class="token string">'iframe'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  iframe<span class="token punctuation">.</span>style<span class="token punctuation">.</span>display <span class="token operator">=</span> <span class="token string">'none'</span><span class="token punctuation">;</span> <span class="token comment">// 隐藏</span>
+
+  <span class="token keyword">var</span> state <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token comment">// 防止页面无限刷新</span>
+  iframe<span class="token punctuation">.</span><span class="token function-variable function">onload</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+      <span class="token keyword">if</span><span class="token punctuation">(</span>state <span class="token operator">===</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+          console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>iframe<span class="token punctuation">.</span>contentWindow<span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token comment">// 清除创建的iframe</span>
+          iframe<span class="token punctuation">.</span>contentWindow<span class="token punctuation">.</span>document<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          iframe<span class="token punctuation">.</span>contentWindow<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          document<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">removeChild</span><span class="token punctuation">(</span>iframe<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span><span class="token punctuation">(</span>state <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+          state <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+          <span class="token comment">// 加载完成，指向当前域，防止错误(proxy.html为空白页面)</span>
+          <span class="token comment">// Blocked a frame with origin "http://localhost:10000" from accessing a cross-origin frame.</span>
+          iframe<span class="token punctuation">.</span>contentWindow<span class="token punctuation">.</span>location <span class="token operator">=</span> <span class="token string">'http://localhost:10000/proxy.html'</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+  iframe<span class="token punctuation">.</span>src <span class="token operator">=</span> <span class="token string">'http://localhost:10001'</span><span class="token punctuation">;</span>
+  document<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>iframe<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+
+<span class="token comment">&lt;!-- localhost:10001 --&gt;</span>
+<span class="token doctype">&lt;!DOCTYPE html&gt;</span>
+...
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">&gt;</span></span><span class="token script language-javascript">
+  window<span class="token punctuation">.</span>name <span class="token operator">=</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{<!-- --></span>a<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span> b<span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">&gt;</span></span>
+<div class="hljs-button signin" data-title="登录后复制" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.4259&quot;}"></div></code><ul class="pre-numbering" style=""><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li></ul></pre>
+<p><strong>注意：</strong></p>
+<ul><li>直接嵌入其他域（localhots:10001）下的URL会报错，所以需要加载完成替换为当前域的URL(localhots:10000)，<code>proxy.html</code>为空白页面，只为解决该问题；<br> <img src="https://img-blog.csdnimg.cn/2019072922383513.png" alt="在这里插入图片描述"></li><li>重新设置 src（http://localhost:10000/proxy.html）后导致页面不断刷新，所以通过 <code>state</code> 来控制；</li><li>全部获取完结果后，清除该 iframe。</li></ul>
+<h3><a name="t6"></a><a name="t6"></a><a id="windowpostMessage_109"></a>方式五：window.postMessage()</h3>
+<p>HTML5新特性，可以用来向其他所有的 window 对象发送消息。需要注意的是我们必须要保证所有的脚本执行完才发送 MessageEvent，如果在函数执行的过程中调用了它，就会让后面的函数超时无法执行。</p>
+<p><strong>下述代码实现了跨域存储localStorage</strong></p>
+<p><em>下述用端口：10000表示 — domainA；10001表示 — domainB</em></p>
+<pre class="prettyprint"><code class="prism language-html has-numbering" onclick="mdcp.signin(event)" style="position: unset;"><span class="token comment">&lt;!-- localhost:10000 --&gt;</span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>http://localhost:10001/msg.html<span class="token punctuation">"</span></span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>myPostMessage<span class="token punctuation">"</span></span><span class="token style-attr language-css"><span class="token attr-name"> <span class="token attr-name">style</span></span><span class="token punctuation">="</span><span class="token attr-value"><span class="token property">display</span><span class="token punctuation">:</span>none<span class="token punctuation">;</span></span><span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">&gt;</span></span><span class="token script language-javascript">
+  <span class="token keyword">function</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+      <span class="token function">LSsetItem</span><span class="token punctuation">(</span><span class="token string">'test'</span><span class="token punctuation">,</span> <span class="token string">'Test: '</span> <span class="token operator">+</span> <span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token function">LSgetItem</span><span class="token punctuation">(</span><span class="token string">'test'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span>value<span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+          console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'value: '</span> <span class="token operator">+</span> value<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token function">LSremoveItem</span><span class="token punctuation">(</span><span class="token string">'test'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">var</span> callbacks <span class="token operator">=</span> <span class="token punctuation">{<!-- --></span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+  window<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'message'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span>event<span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>event<span class="token punctuation">.</span>source <span class="token operator">===</span> frames<span class="token punctuation">[</span><span class="token string">'myPostMessage'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+          console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>event<span class="token punctuation">)</span>
+          <span class="token keyword">var</span> data <span class="token operator">=</span> <span class="token regex">/^#localStorage#(\d+)(null)?#([\S\s]*)/</span><span class="token punctuation">.</span><span class="token function">exec</span><span class="token punctuation">(</span>event<span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token keyword">if</span> <span class="token punctuation">(</span>data<span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+              <span class="token keyword">if</span> <span class="token punctuation">(</span>callbacks<span class="token punctuation">[</span>data<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+                  callbacks<span class="token punctuation">[</span>data<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">(</span>data<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">===</span> <span class="token string">'null'</span> <span class="token operator">?</span> <span class="token keyword">null</span> <span class="token punctuation">:</span> data<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+              <span class="token punctuation">}</span>
+              <span class="token keyword">delete</span> callbacks<span class="token punctuation">[</span>data<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+          <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">var</span> domain <span class="token operator">=</span> <span class="token string">'*'</span><span class="token punctuation">;</span>
+  <span class="token comment">// 增加</span>
+  <span class="token keyword">function</span> <span class="token function">LSsetItem</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> value<span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+      <span class="token keyword">var</span> obj <span class="token operator">=</span> <span class="token punctuation">{<!-- --></span>
+          setItem<span class="token punctuation">:</span> key<span class="token punctuation">,</span>
+          value<span class="token punctuation">:</span> value
+      <span class="token punctuation">}</span><span class="token punctuation">;</span>
+      frames<span class="token punctuation">[</span><span class="token string">'myPostMessage'</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">postMessage</span><span class="token punctuation">(</span><span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">,</span> domain<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment">// 获取</span>
+  <span class="token keyword">function</span> <span class="token function">LSgetItem</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> callback<span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+      <span class="token keyword">var</span> identifier <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">var</span> obj <span class="token operator">=</span> <span class="token punctuation">{<!-- --></span>
+          identifier<span class="token punctuation">:</span> identifier<span class="token punctuation">,</span>
+          getItem<span class="token punctuation">:</span> key
+      <span class="token punctuation">}</span><span class="token punctuation">;</span>
+      callbacks<span class="token punctuation">[</span>identifier<span class="token punctuation">]</span> <span class="token operator">=</span> callback<span class="token punctuation">;</span>
+      frames<span class="token punctuation">[</span><span class="token string">'myPostMessage'</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">postMessage</span><span class="token punctuation">(</span><span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">,</span> domain<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment">// 删除</span>
+  <span class="token keyword">function</span> <span class="token function">LSremoveItem</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+      <span class="token keyword">var</span> obj <span class="token operator">=</span> <span class="token punctuation">{<!-- --></span>
+          removeItem<span class="token punctuation">:</span> key
+      <span class="token punctuation">}</span><span class="token punctuation">;</span>
+      frames<span class="token punctuation">[</span><span class="token string">'myPostMessage'</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">postMessage</span><span class="token punctuation">(</span><span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">,</span> domain<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+
+<span class="token comment">&lt;!-- localhost:10001 --&gt;</span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">&gt;</span></span><span class="token script language-javascript">
+  window<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'message'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span>event<span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Receiver debugging'</span><span class="token punctuation">,</span> event<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>event<span class="token punctuation">.</span>origin <span class="token operator">==</span> <span class="token string">'http://localhost:10000'</span><span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+      <span class="token keyword">var</span> data <span class="token operator">=</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>event<span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token string">'setItem'</span> <span class="token keyword">in</span> data<span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+        localStorage<span class="token punctuation">.</span><span class="token function">setItem</span><span class="token punctuation">(</span>data<span class="token punctuation">.</span>setItem<span class="token punctuation">,</span> data<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token string">'getItem'</span> <span class="token keyword">in</span> data<span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+        <span class="token keyword">var</span> gotItem <span class="token operator">=</span> localStorage<span class="token punctuation">.</span><span class="token function">getItem</span><span class="token punctuation">(</span>data<span class="token punctuation">.</span>getItem<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        event<span class="token punctuation">.</span>source<span class="token punctuation">.</span><span class="token function">postMessage</span><span class="token punctuation">(</span>
+          <span class="token string">'#localStorage#'</span> <span class="token operator">+</span> data<span class="token punctuation">.</span>identifier <span class="token operator">+</span>
+          <span class="token punctuation">(</span>gotItem <span class="token operator">===</span> <span class="token keyword">null</span> <span class="token operator">?</span> <span class="token string">'null#'</span> <span class="token punctuation">:</span> <span class="token string">'#'</span> <span class="token operator">+</span> gotItem<span class="token punctuation">)</span><span class="token punctuation">,</span>
+          event<span class="token punctuation">.</span>origin
+        <span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token string">'removeItem'</span> <span class="token keyword">in</span> data<span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+        localStorage<span class="token punctuation">.</span><span class="token function">removeItem</span><span class="token punctuation">(</span>data<span class="token punctuation">.</span>removeItem<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+<div class="hljs-button signin" data-title="登录后复制" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.4259&quot;}"></div></code><ul class="pre-numbering" style=""><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li><li style="color: rgb(153, 153, 153);">33</li><li style="color: rgb(153, 153, 153);">34</li><li style="color: rgb(153, 153, 153);">35</li><li style="color: rgb(153, 153, 153);">36</li><li style="color: rgb(153, 153, 153);">37</li><li style="color: rgb(153, 153, 153);">38</li><li style="color: rgb(153, 153, 153);">39</li><li style="color: rgb(153, 153, 153);">40</li><li style="color: rgb(153, 153, 153);">41</li><li style="color: rgb(153, 153, 153);">42</li><li style="color: rgb(153, 153, 153);">43</li><li style="color: rgb(153, 153, 153);">44</li><li style="color: rgb(153, 153, 153);">45</li><li style="color: rgb(153, 153, 153);">46</li><li style="color: rgb(153, 153, 153);">47</li><li style="color: rgb(153, 153, 153);">48</li><li style="color: rgb(153, 153, 153);">49</li><li style="color: rgb(153, 153, 153);">50</li><li style="color: rgb(153, 153, 153);">51</li><li style="color: rgb(153, 153, 153);">52</li><li style="color: rgb(153, 153, 153);">53</li><li style="color: rgb(153, 153, 153);">54</li><li style="color: rgb(153, 153, 153);">55</li><li style="color: rgb(153, 153, 153);">56</li><li style="color: rgb(153, 153, 153);">57</li><li style="color: rgb(153, 153, 153);">58</li><li style="color: rgb(153, 153, 153);">59</li><li style="color: rgb(153, 153, 153);">60</li><li style="color: rgb(153, 153, 153);">61</li><li style="color: rgb(153, 153, 153);">62</li><li style="color: rgb(153, 153, 153);">63</li><li style="color: rgb(153, 153, 153);">64</li><li style="color: rgb(153, 153, 153);">65</li><li style="color: rgb(153, 153, 153);">66</li><li style="color: rgb(153, 153, 153);">67</li><li style="color: rgb(153, 153, 153);">68</li><li style="color: rgb(153, 153, 153);">69</li><li style="color: rgb(153, 153, 153);">70</li><li style="color: rgb(153, 153, 153);">71</li><li style="color: rgb(153, 153, 153);">72</li><li style="color: rgb(153, 153, 153);">73</li><li style="color: rgb(153, 153, 153);">74</li><li style="color: rgb(153, 153, 153);">75</li><li style="color: rgb(153, 153, 153);">76</li></ul></pre>
+<p><strong>注意Safari下会报错：</strong></p>
+<blockquote>
+ <p>Blocked a frame with origin “http://localhost:10001” from accessing a frame with origin “http://localhost:10000”. Protocols, domains, and ports must match.</p>
+</blockquote>
+<p>避免该错误，可以在Safari浏览器中勾选 <strong>开发菜单 =&gt; 停用跨域限制</strong>。或者只能使用服务器端转存的方式实现，因为Safari浏览器默认只支持CORS跨域请求。</p>
+<h3><a name="t7"></a><a name="t7"></a><a id="documentdomain_202"></a>方式六：修改document.domain跨子域</h3>
+<p><strong>前提条件：这两个域名必须属于同一个基础域名！而且所用的协议，端口都要一致，否则无法利用 <code>document.domain</code> 进行跨域，所以只能跨子域</strong></p>
+<p>在<a href="https://developer.mozilla.org/en-US/docs/XPCOM_Interface_Reference/nsIEffectiveTLDService#getBaseDomain.28.29">根域</a>范围内，允许把 domain 属性的值设置为它的上一级域。例如，在 “aaa.xxx.com” 域内，可以把 domain 设置为 “xxx.com” 但不能设置为 “xxx.org” 或者 “com”。</p>
+<blockquote>
+ <p>现在存在两个域名aaa.xxx.com和bbb.xxx.com。在aaa下嵌入bbb的页面，由于其 <code>document.name</code>不一致，无法在aaa下操作bbb的js。可以在aaa和bbb下通过js将 <code>document.name = 'xxx.com';</code> 设置一致，来达到互相访问的作用。</p>
+</blockquote>
+<h3><a name="t8"></a><a name="t8"></a><a id="WebSocket_210"></a>方式七：WebSocket</h3>
+<p>WebSocket protocol 是 HTML5 一种新的协议。它实现了浏览器与服务器全双工通信，同时允许跨域通讯，是server push技术的一种很棒的实现。相关文章，请查看：<a href="http://blog.csdn.net/ligang2585116/article/details/47259301">WebSocket</a>、<a href="http://blog.csdn.net/ligang2585116/article/details/47277917">WebSocket-SockJS</a></p>
+<p><strong>需要注意：</strong> WebSocket 对象不支持 DOM 2 级事件侦听器，必须使用 DOM 0 级语法分别定义各个事件。</p>
+<h3><a name="t9"></a><a name="t9"></a><a id="_216"></a>方式八：代理</h3>
+<p>同源策略是针对浏览器端进行的限制，可以通过服务器端来解决该问题<br> DomainA客户端（浏览器） =&gt; DomainA服务器 =&gt; DomainB服务器 =&gt; DomainA客户端（浏览器）<br> <strong>实现HTTP、HTTPS代理请参照：</strong> <a href="http://blog.csdn.net/ligang2585116/article/details/72827781">创建HTTP与HTTPS服务器与客户端</a></p>
+                </div><div data-report-view="{&quot;mod&quot;:&quot;1585297308_001&quot;,&quot;dest&quot;:&quot;https://ligang.blog.csdn.net/article/details/73072868&quot;,&quot;extend1&quot;:&quot;pc&quot;,&quot;ab&quot;:&quot;new&quot;}"><div></div></div><div data-report-view="{&quot;mod&quot;:&quot;1585297308_001&quot;,&quot;dest&quot;:&quot;https://ligang.blog.csdn.net/article/details/73072868&quot;,&quot;extend1&quot;:&quot;pc&quot;,&quot;ab&quot;:&quot;new&quot;}"><div></div></div><div data-report-view="{&quot;mod&quot;:&quot;1585297308_001&quot;,&quot;dest&quot;:&quot;https://ligang.blog.csdn.net/article/details/73072868&quot;,&quot;extend1&quot;:&quot;pc&quot;,&quot;ab&quot;:&quot;new&quot;}"><div></div></div>
+                <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/markdown_views-d7a94ec6ab.css" rel="stylesheet">
+                <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/style-80ad9b4f5b.css" rel="stylesheet">
+        </div>
+<div class="blogger-info-card">
+    <div class="card-lt">
+        <a href="https://ligang.blog.csdn.net" target="_blank">
+            <img src="https://profile.csdnimg.cn/1/4/A/3_ligang2585116" username="ligang2585116" alt="">
+        </a>
+    </div>
+    <div class="card-rt">
+        <div class="card-rt-header">
+            <a href="https://ligang.blog.csdn.net" target="_blank">
+                <strong class="nick-name" username="ligang2585116">
+                    奋飛
+                </strong>
+            </a>
+          
+            <i class="space"></i>
+                <span class="tag">技术管理</span>
+                <span class="tag">前端工程化</span>
+        </div>
+        <div class="card-rt-body">
+            乐观、勇气、专注、果断、好奇、公正、慎思、真诚、追求极致追求完美、诚信！独立撰写了多个前端专题模块，访问量达百万级。多次负责组织大数据可视化前端架构平台开发工作。对前端新技术、新潮流具有很强的敏锐力和洞察力！
+        </div>
+    </div>
+</div>
+    </article>
