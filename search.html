@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link rel="stylesheet" href="static/css/search.css">
+    <title>GoSearch-Home</title>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row py-3">
+        <div class="input-group">
+          <input id="searchbox" autofocus autocomplete="off" type="text">
+          <span class="input-group-text rotate" id="searchIcon" data-toggle="tooltip" data-placement="left" title="click to search"></span>
+
+        </div>
+        <div id="searchContents" class="py-1"></div>
+
+    </div>
+    <div class="row">
+      <div class="container">
+        <div id="searchResults"></div>
+      </div>
+
+    </div>
+    </div>
+
+    <script src="static/jquery.min.js"></script>
+   <script src="static/search.js"></script>
+  </body>

@@ -1,0 +1,60 @@
+body{
+  font-family:  Georgia, Times New Roman, Times, serif;
+}
+
+#searchbox {
+  width:5px;
+  border-style:none;
+  border-radius: 2px;
+  font-size: 25px;
+  caret-color: #FFF;
+  margin-right:2px;
+}
+#searchbox:focus{
+  outline: none;
+  border-style:none;
+
+}
+
+.input-group-text{
+  background-image:url('./../images/searchicon.svg');
+  background-size: 35px;
+  width:35px;
+  height:35px;
+  border-style:none;
+  cursor: pointer;
+}
+.rotate {
+  background-color: transparent;
+  transform: rotate(270deg);
+}
+
+.blink {
+  -webkit-animation: 2s linear infinite condemned_blink_effect; /* for Safari 4.0 - 8.0 */
+  animation: 2s linear infinite condemned_blink_effect;
+}
+
+/* for Safari 4.0 - 8.0 */
+@-webkit-keyframes condemned_blink_effect {
+  0% {
+    visibility: hidden;
+  }
+  50% {
+    visibility: hidden;
+  }
+  100% {
+    visibility: visible;
+  }
+}
+
+@keyframes condemned_blink_effect {
+  0% {
+    visibility: hidden;
+  }
+  50% {
+    visibility: hidden;
+  }
+  100% {
+    visibility: visible;
+  }
+}
