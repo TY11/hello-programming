@@ -18,19 +18,45 @@ document.addEventListener('DOMContentLoaded',()=>{
         document.querySelector('#searchContents').innerHTML = 'Search for '+val;
         searchInput.value = "";
 
-          $.ajaxPrefilter( function (options) {
-          if (options.crossDomain && jQuery.support.cors) {
-            var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
-            options.url = 'https://cors-anywhere.herokuapp.com/' + options.url;
-          }
-        });
-        $.get(
+        $.ajaxPrefilter( function (options) {
+            if (options.crossDomain && jQuery.support.cors) {
+              var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
+              options.url = 'https://cors-anywhere.herokuapp.com/' + options.url;
+            }
+          });
+          $.get(
             'https://www.google.com/search?q='+val,
             function (response) {
                 console.log("> ", response);
                 $("#searchResults").html(response);
-        });
+                const pages = document.querySelectorAll('*[aria-label^="Page"]');
+                pages.forEach(function(element) {
+                    url = element.href.slice(20);
+                    console.log(url);
+
+                    element.href = "javascript:forwardPages(url)";
+                });
+          });
+
+
       }
     };
   });
 });
+
+function forwardPages(getUrl){
+
+  $.ajaxPrefilter( function (options) {
+      if (options.crossDomain && jQuery.support.cors) {
+        var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
+        options.url = 'https://cors-anywhere.herokuapp.com/' + options.url;
+      }
+    });
+    $.get(
+
+      'https://www.google.com/search?q='+getUrl,
+      function (response) {
+          console.log("> ", response);
+          $("#searchResults").html(response);
+      });
+}
